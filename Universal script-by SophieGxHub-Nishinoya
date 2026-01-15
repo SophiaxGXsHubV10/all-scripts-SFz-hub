@@ -1,4 +1,4 @@
---// Serviços
+wait(2) --// Serviços
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
@@ -29,10 +29,15 @@ sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 sidebar.ScrollBarImageTransparency = 1
 sidebar.BackgroundColor3 = Color3.fromRGB(70, 30, 130)
 sidebar.BorderSizePixel = 0
-sidebar.ClipsDescendants = true
 
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 15)
-Instance.new("UIStroke", sidebar).Thickness = 2
+local layout = Instance.new("UIListLayout", sidebar)
+layout.Padding = UDim.new(0, 6)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    sidebar.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+end)
 
 --// Conteúdo
 local content = Instance.new("Frame")
@@ -41,136 +46,111 @@ content.Position = UDim2.new(0, 220, 0, 0)
 content.Size = UDim2.new(1, -220, 1, 0)
 content.BackgroundColor3 = Color3.fromRGB(110, 60, 180)
 content.BorderSizePixel = 0
-
 Instance.new("UICorner", content).CornerRadius = UDim.new(0, 15)
-Instance.new("UIStroke", content).Thickness = 2
-
---// Layout sidebar
-local layout = Instance.new("UIListLayout")
-layout.Parent = sidebar
-layout.Padding = UDim.new(0, 6)
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	sidebar.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
-end)
 
 --// Abas
-local tabs = {
-	"99 Noites",
-	"Steal a Brainrot"
-}
-
+local tabs = {"99 Noites", "Steal a Brainrot"}
 local pages = {}
 
---// Função Sub-Abas
+--// Função de Sub-Abas (Botões)
 local function createSubFrame(page)
-	local sf = Instance.new("ScrollingFrame")
-	sf.Parent = page
-	sf.Position = UDim2.new(0, 20, 0, 70)
-	sf.Size = UDim2.new(0, 360, 1, -90)
-	sf.CanvasSize = UDim2.new(0, 0, 0, 0)
-	sf.ScrollBarImageTransparency = 0.4
-	sf.BackgroundTransparency = 1
-	sf.BorderSizePixel = 0
+    local sf = Instance.new("ScrollingFrame")
+    sf.Parent = page
+    sf.Position = UDim2.new(0, 20, 0, 70)
+    sf.Size = UDim2.new(1, -40, 1, -90)
+    sf.CanvasSize = UDim2.new(0, 0, 0, 0)
+    sf.ScrollBarImageTransparency = 0.4
+    sf.BackgroundTransparency = 1
+    sf.BorderSizePixel = 0
 
-	local sl = Instance.new("UIListLayout")
-	sl.Parent = sf
-	sl.Padding = UDim.new(0, 10)
-	sl.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    local sl = Instance.new("UIListLayout", sf)
+    sl.Padding = UDim.new(0, 10)
+    sl.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-	sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		sf.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 10)
-	end)
+    sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        sf.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 10)
+    end)
 
-	return function(text, callback)
-		local b = Instance.new("TextButton")
-		b.Parent = sf
-		b.Size = UDim2.new(1, -10, 0, 45)
-		b.Text = text
-		b.BackgroundColor3 = Color3.fromRGB(150, 90, 230)
-		b.TextColor3 = Color3.new(1, 1, 1)
-		b.Font = Enum.Font.GothamBold
-		b.TextSize = 15
-		b.BorderSizePixel = 0
-		Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
-
-		b.MouseButton1Click:Connect(callback)
-	end
+    return function(text, callback)
+        local b = Instance.new("TextButton", sf)
+        b.Size = UDim2.new(1, -10, 0, 45)
+        b.Text = text
+        b.BackgroundColor3 = Color3.fromRGB(150, 90, 230)
+        b.TextColor3 = Color3.new(1, 1, 1)
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 15
+        b.BorderSizePixel = 0
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
+        b.MouseButton1Click:Connect(callback)
+    end
 end
 
---// Criar abas
+--// Criar as Abas e Seus Conteúdos
 for _, name in ipairs(tabs) do
-	-- Botão
-	local button = Instance.new("TextButton")
-	button.Parent = sidebar
-	button.Size = UDim2.new(1, -12, 0, 36)
-	button.Text = name
-	button.BackgroundColor3 = Color3.fromRGB(120, 70, 200)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Font = Enum.Font.Gotham
-	button.TextSize = 14
-	button.BorderSizePixel = 0
-	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 10)
+    -- Botão da Aba
+    local button = Instance.new("TextButton", sidebar)
+    button.Size = UDim2.new(1, -12, 0, 36)
+    button.Text = name
+    button.BackgroundColor3 = Color3.fromRGB(120, 70, 200)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 14
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 10)
 
-	-- Página
-	local page = Instance.new("Frame")
-	page.Parent = content
-	page.Size = UDim2.new(1, 0, 1, 0)
-	page.Visible = false
-	page.BackgroundTransparency = 1
-	pages[name] = page
+    -- Página da Aba
+    local page = Instance.new("Frame", content)
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.Visible = false
+    page.BackgroundTransparency = 1
+    pages[name] = page
 
-	-- Título
-	local title = Instance.new("TextLabel")
-	title.Parent = page
-	title.Size = UDim2.new(1, 0, 0, 50)
-	title.Text = name .. " - Categoria"
-	title.Font = Enum.Font.GothamBold
-	title.TextSize = 22
-	title.TextColor3 = Color3.new(1, 1, 1)
-	title.BackgroundTransparency = 1
+    -- Título da Categoria
+    local title = Instance.new("TextLabel", page)
+    title.Size = UDim2.new(1, 0, 0, 50)
+    title.Text = name .. " - Categoria"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 22
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.BackgroundTransparency = 1
 
-	--// STEAL A BRAINROT
-	if name == "Steal a Brainrot" then
-		local addSub = createSubFrame(page)
+    local addSub = createSubFrame(page)
 
-		addSub("Lennon Hub ⭐", function()
-			loadstring(game:HttpGet("https://pastefy.app/MJw2J4T6/raw"))()
-		end)
+    --// LÓGICA DE SCRIPTS POR CATEGORIA
+    if name == "99 Noites" then
+        addSub("Voidware (sem key)", function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"))()
+        end)
+        addSub("H4x (com key)", function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"))()
+        end)
+        addSub("Fox name (sem key)", function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-Foxname-Hub-57131"))()
+        end)
+    elseif name == "Steal a Brainrot" then
+        addSub("Overflow (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OverflowBGSI/Overflow/refs/heads/main/loader.txt"))() end)
+        addSub("Lurk hack (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurkv3/refs/heads/main/main.lua", true))() end)
+        addSub("Senju (com key)", function() loadstring(game:HttpGet("https://pastebin.com/raw/wk11PpEw"))() end)
+        addSub("Devil Ugly", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))() end)
+        addSub("Dofug (sem key)", function() loadstring(game:HttpGet("https://gist.githubusercontent.com/UCT-hub/b8fcd843274469d860f91b041eb7f52f/raw/7d491ea8078224e31b8850192bd3f2da37acec8f/UCTHUBDOFUG"))() end)
+        addSub("Ajazz (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/onliengamerop/Steal-a-brainrot/refs/heads/main/Protected_3771863424757750.lua.txt"))() end)
+        addSub("Liphyr", function() loadstring(game:HttpGet("https://pastefy.app/9fgffG4l/raw"))() end)
+        addSub("Cartola hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Davi999z/Cartola-Hub/refs/heads/main/StealABrainrot.lua", true))() end)
+        addSub("Flame hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/shizukidev/FlameNslx/refs/heads/main/flamexnslx.lua"))() end)
+        addSub("Trax Spawner (com key)", function() loadstring(game:HttpGet("https://gitlab.com/traxscriptss/traxscriptss/-/raw/main/visual2.lua"))() end)
+        addSub("Lennon hub ⭐ RECOMENDADO", function() loadstring(game:HttpGet("https://pastefy.app/MJw2J4T6/raw"))() end)
+        addSub("Lumora ⭐ RECOMENDADO", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3e7e5539bf07cd98f855ebb0c29c8081.lua"))() end)
+        addSub("Kurd hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Ninja10908/S4/refs/heads/main/Kurdhub"))() end)
+        addSub("LH hub (sem key)", function() loadstring(game:HttpGet("https://pastefy.app/o9mKKAda/raw"))() end)
+        addSub("Zzzz hub (sem key)", function() loadstring(game:HttpGet("https://pastefy.app/DHyT4Zoi/raw"))() end)
+    end
 
-		addSub("Lumora ⭐", function()
-			loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3e7e5539bf07cd98f855ebb0c29c8081.lua"))()
-		end)
-	end
-
-	--// 99 NOITES
-	if name == "99 Noites" then
-		local addSub = createSubFrame(page)
-
-		addSub("Voidware (sem key)", function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"))()
-		end)
-
-		addSub("H4x (com key)", function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"))()
-		end)
-
-		addSub("Fox name (sem key)", function()
-			loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-Foxname-Hub-57131"))()
-		end)
-	end
-
-	-- Clique aba
-	button.MouseButton1Click:Connect(function()
-		for _, p in pairs(pages) do
-			p.Visible = false
-		end
-		page.Visible = true
-	end)
+    -- Evento de clique no botão da sidebar
+    button.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+    end)
 end
 
---// Abrir primeira aba
+--// Iniciar na primeira aba
 pages[tabs[1]].Visible = true
 warn("✅ HUB CARREGADO COM SUCESSO")
-
