@@ -1,10 +1,10 @@
-wait(2) --// Serviços
+wait(1) --// Pequeno delay para garantir carregamento
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 --// GUI
 local gui = Instance.new("ScreenGui")
-gui.Name = "HubAbasRoxo"
+gui.Name = "HubCompletoJogos"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
@@ -13,21 +13,25 @@ local main = Instance.new("Frame")
 main.Parent = gui
 main.Size = UDim2.new(0, 720, 0, 420)
 main.Position = UDim2.new(0.5, -360, 0.5, -210)
-main.BackgroundColor3 = Color3.fromRGB(90, 40, 160)
+main.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
 main.Active = true
 main.Draggable = true
 main.BorderSizePixel = 0
 
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 15)
-Instance.new("UIStroke", main).Thickness = 2
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(90, 40, 160)
+stroke.Thickness = 2
 
---// Sidebar
+--// Sidebar (Menu Lateral)
 local sidebar = Instance.new("ScrollingFrame")
 sidebar.Parent = main
-sidebar.Size = UDim2.new(0, 220, 1, 0)
+sidebar.Size = UDim2.new(0, 220, 1, -20)
+sidebar.Position = UDim2.new(0, 10, 0, 10)
 sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
-sidebar.ScrollBarImageTransparency = 1
-sidebar.BackgroundColor3 = Color3.fromRGB(70, 30, 130)
+sidebar.ScrollBarImageTransparency = 0.8
+sidebar.ScrollBarThickness = 4
+sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 sidebar.BorderSizePixel = 0
 
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 15)
@@ -36,121 +40,171 @@ layout.Padding = UDim.new(0, 6)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    sidebar.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+	sidebar.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
 end)
 
---// Conteúdo
+--// Conteúdo (Lado Direito)
 local content = Instance.new("Frame")
 content.Parent = main
-content.Position = UDim2.new(0, 220, 0, 0)
-content.Size = UDim2.new(1, -220, 1, 0)
-content.BackgroundColor3 = Color3.fromRGB(110, 60, 180)
+content.Position = UDim2.new(0, 240, 0, 10)
+content.Size = UDim2.new(1, -250, 1, -20)
+content.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 content.BorderSizePixel = 0
 Instance.new("UICorner", content).CornerRadius = UDim.new(0, 15)
 
---// Abas
-local tabs = {"99 Noites", "Steal a Brainrot"}
+--// LISTA DE CATEGORIAS
+local tabs = {
+	"🌲99 noites",
+	"👽 Steal a brainrot", -- NOME ALTERADO AQUI
+	"🍎 Blox Fruits",
+	"🏐 Voleyball Legends",
+	"⚽ Blue Lock",
+	"🎭 Forsaken",
+	"🌴 Grow a Garden",
+	"🐟 Fish",
+	"👊 Campos de Batalha",
+	"🛶 Build a Boat",
+	"🔪 MM2",
+	"⛏️ The Forge",
+	"🗡️ Blade Ball",
+	"☠️ Death Ball",
+	"🏠 Brookheaven RP",
+	"🚂 Trilhos Mortos"
+}
 local pages = {}
 
---// Função de Sub-Abas (Botões)
+--// Função de Sub-Abas (Botões de Script)
 local function createSubFrame(page)
-    local sf = Instance.new("ScrollingFrame")
-    sf.Parent = page
-    sf.Position = UDim2.new(0, 20, 0, 70)
-    sf.Size = UDim2.new(1, -40, 1, -90)
-    sf.CanvasSize = UDim2.new(0, 0, 0, 0)
-    sf.ScrollBarImageTransparency = 0.4
-    sf.BackgroundTransparency = 1
-    sf.BorderSizePixel = 0
+	local sf = Instance.new("ScrollingFrame")
+	sf.Parent = page
+	sf.Position = UDim2.new(0, 10, 0, 50)
+	sf.Size = UDim2.new(1, -20, 1, -60)
+	sf.CanvasSize = UDim2.new(0, 0, 0, 0)
+	sf.ScrollBarImageTransparency = 0.5
+	sf.BackgroundTransparency = 1
+	sf.BorderSizePixel = 0
+	sf.ScrollBarThickness = 6
 
-    local sl = Instance.new("UIListLayout", sf)
-    sl.Padding = UDim.new(0, 10)
-    sl.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	local sl = Instance.new("UIListLayout", sf)
+	sl.Padding = UDim.new(0, 8)
+	sl.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        sf.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 10)
-    end)
+	sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		sf.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 10)
+	end)
 
-    return function(text, callback)
-        local b = Instance.new("TextButton", sf)
-        b.Size = UDim2.new(1, -10, 0, 45)
-        b.Text = text
-        b.BackgroundColor3 = Color3.fromRGB(150, 90, 230)
-        b.TextColor3 = Color3.new(1, 1, 1)
-        b.Font = Enum.Font.GothamBold
-        b.TextSize = 15
-        b.BorderSizePixel = 0
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
-        b.MouseButton1Click:Connect(callback)
-    end
+	return function(text, callback)
+		local b = Instance.new("TextButton", sf)
+		b.Size = UDim2.new(1, -10, 0, 40)
+		b.Text = text
+		b.BackgroundColor3 = Color3.fromRGB(80, 40, 140)
+		b.TextColor3 = Color3.new(1, 1, 1)
+		b.Font = Enum.Font.GothamBold
+		b.TextSize = 14
+		b.BorderSizePixel = 0
+		Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+		
+		b.MouseButton1Click:Connect(function()
+			pcall(callback)
+		end)
+	end
 end
 
---// Criar as Abas e Seus Conteúdos
-for _, name in ipairs(tabs) do
-    -- Botão da Aba
-    local button = Instance.new("TextButton", sidebar)
-    button.Size = UDim2.new(1, -12, 0, 36)
-    button.Text = name
-    button.BackgroundColor3 = Color3.fromRGB(120, 70, 200)
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 14
-    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 10)
+--// GERAR ABAS
+for i, name in ipairs(tabs) do
+	-- Botão Lateral
+	local button = Instance.new("TextButton", sidebar)
+	button.Size = UDim2.new(0.9, 0, 0, 35)
+	button.Text = name
+	button.BackgroundColor3 = Color3.fromRGB(60, 30, 100)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.Gotham
+	button.TextSize = 13
+	button.TextTruncate = Enum.TextTruncate.AtEnd
+	Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
-    -- Página da Aba
-    local page = Instance.new("Frame", content)
-    page.Size = UDim2.new(1, 0, 1, 0)
-    page.Visible = false
-    page.BackgroundTransparency = 1
-    pages[name] = page
+	-- Página de Conteúdo
+	local page = Instance.new("Frame", content)
+	page.Size = UDim2.new(1, 0, 1, 0)
+	page.Visible = (i == 1)
+	page.BackgroundTransparency = 1
+	pages[name] = page
 
-    -- Título da Categoria
-    local title = Instance.new("TextLabel", page)
-    title.Size = UDim2.new(1, 0, 0, 50)
-    title.Text = name .. " - Categoria"
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 22
-    title.TextColor3 = Color3.new(1, 1, 1)
-    title.BackgroundTransparency = 1
+	-- Título da Página
+	local title = Instance.new("TextLabel", page)
+	title.Size = UDim2.new(1, 0, 0, 40)
+	title.Text = name
+	title.Font = Enum.Font.GothamBlack
+	title.TextSize = 24
+	title.TextColor3 = Color3.fromRGB(180, 140, 255)
+	title.BackgroundTransparency = 1
 
-    local addSub = createSubFrame(page)
+	local addSub = createSubFrame(page)
 
-    --// LÓGICA DE SCRIPTS POR CATEGORIA
-    if name == "99 Noites" then
-        addSub("Voidware (sem key)", function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"))()
-        end)
-        addSub("H4x (com key)", function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"))()
-        end)
-        addSub("Fox name (sem key)", function()
-            loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-Foxname-Hub-57131"))()
-        end)
-    elseif name == "Steal a Brainrot" then
-        addSub("Overflow (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OverflowBGSI/Overflow/refs/heads/main/loader.txt"))() end)
-        addSub("Lurk hack (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurkv3/refs/heads/main/main.lua", true))() end)
-        addSub("Senju (com key)", function() loadstring(game:HttpGet("https://pastebin.com/raw/wk11PpEw"))() end)
-        addSub("Devil Ugly", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))() end)
-        addSub("Dofug (sem key)", function() loadstring(game:HttpGet("https://gist.githubusercontent.com/UCT-hub/b8fcd843274469d860f91b041eb7f52f/raw/7d491ea8078224e31b8850192bd3f2da37acec8f/UCTHUBDOFUG"))() end)
-        addSub("Ajazz (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/onliengamerop/Steal-a-brainrot/refs/heads/main/Protected_3771863424757750.lua.txt"))() end)
-        addSub("Liphyr", function() loadstring(game:HttpGet("https://pastefy.app/9fgffG4l/raw"))() end)
-        addSub("Cartola hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Davi999z/Cartola-Hub/refs/heads/main/StealABrainrot.lua", true))() end)
-        addSub("Flame hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/shizukidev/FlameNslx/refs/heads/main/flamexnslx.lua"))() end)
-        addSub("Trax Spawner (com key)", function() loadstring(game:HttpGet("https://gitlab.com/traxscriptss/traxscriptss/-/raw/main/visual2.lua"))() end)
-        addSub("Lennon hub ⭐ RECOMENDADO", function() loadstring(game:HttpGet("https://pastefy.app/MJw2J4T6/raw"))() end)
-        addSub("Lumora ⭐ RECOMENDADO", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3e7e5539bf07cd98f855ebb0c29c8081.lua"))() end)
-        addSub("Kurd hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Ninja10908/S4/refs/heads/main/Kurdhub"))() end)
-        addSub("LH hub (sem key)", function() loadstring(game:HttpGet("https://pastefy.app/o9mKKAda/raw"))() end)
-        addSub("Zzzz hub (sem key)", function() loadstring(game:HttpGet("https://pastefy.app/DHyT4Zoi/raw"))() end)
-    end
+	--// LÓGICA DOS JOGOS
+	if name == "🌲99 noites" then
+		addSub("Voidware (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"))() end)
+		addSub("H4x (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"))() end)
+		addSub("Fox name (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-Foxname-Hub-57131"))() end)
 
-    -- Evento de clique no botão da sidebar
-    button.MouseButton1Click:Connect(function()
-        for _, p in pairs(pages) do p.Visible = false end
-        page.Visible = true
-    end)
+	elseif name == "👽 Steal a brainrot" then -- VERIFICAÇÃO ATUALIZADA AQUI
+		addSub("Lennon hub ⭐", function() loadstring(game:HttpGet("https://pastefy.app/MJw2J4T6/raw"))() end)
+		addSub("Lumora ⭐", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3e7e5539bf07cd98f855ebb0c29c8081.lua"))() end)
+		addSub("Overflow (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OverflowBGSI/Overflow/refs/heads/main/loader.txt"))() end)
+		addSub("Cartola hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Davi999z/Cartola-Hub/refs/heads/main/StealABrainrot.lua", true))() end)
+
+	elseif name == "🍎 Blox Fruits" then
+		addSub("Hoho Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))() end)
+		addSub("W-Azure (Auto Farm)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3b2169cf53bc6104dabe8e19562e5cc2.lua"))() end)
+
+	elseif name == "🏐 Voleyball Legends" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+		
+	elseif name == "⚽ Blue Lock" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+
+	elseif name == "🎭 Forsaken" then
+		addSub("Script Forsaken (Exemplo)", function() print("Coloque o script aqui") end)
+
+	elseif name == "🌴 Grow a Garden" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+
+	elseif name == "🐟 Fish" then
+		addSub("Speed Hub X", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))() end)
+
+	elseif name == "👊 Campos de Batalha" then
+		addSub("Kade Hub (Strongest)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/KadeHub/main/KadeHub.lua"))() end)
+
+	elseif name == "🛶 Build a Boat" then
+		addSub("V0rq (Auto Build)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/V0rq/V0rq/main/Bafb.lua"))() end)
+
+	elseif name == "🔪 MM2" then
+		addSub("Eclipse Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Ethanoj1/EclipseMM2/master/Script"))() end)
+
+	elseif name == "⛏️ The Forge" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+
+	elseif name == "🗡️ Blade Ball" then
+		addSub("Redz Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/BladeBall/main/redz9999"))() end)
+
+	elseif name == "☠️ Death Ball" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+
+	elseif name == "🏠 Brookheaven RP" then
+		addSub("Ice Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/IceMael7/IceHub/main/Brookhaven"))() end)
+
+	elseif name == "🚂 Trilhos Mortos" then
+		addSub("Infinite Yield (Admin)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() end)
+	end
+
+	button.MouseButton1Click:Connect(function()
+		for _, p in pairs(pages) do p.Visible = false end
+		page.Visible = true
+	end)
 end
 
---// Iniciar na primeira aba
-pages[tabs[1]].Visible = true
-warn("✅ HUB CARREGADO COM SUCESSO")
+if pages[tabs[1]] then
+	pages[tabs[1]].Visible = true
+end
+
+warn("✅ HUB COMPLETO CARREGADO!")
