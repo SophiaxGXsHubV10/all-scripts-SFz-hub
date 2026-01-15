@@ -1,3 +1,115 @@
+-- LocalScript
+-- Coloque este LocalScript em StarterPlayer -> StarterPlayerScripts
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Criar ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WelcomeGui"
+screenGui.Parent = playerGui
+
+-- Frame da borda (maior, roxo)
+local borderFrame = Instance.new("Frame")
+borderFrame.Size = UDim2.new(0.42, 0, 0.12, 0) -- ligeiramente maior
+borderFrame.Position = UDim2.new(0.29, 0, 0.44, 0)
+borderFrame.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- roxo da borda
+borderFrame.BorderSizePixel = 0
+borderFrame.BackgroundTransparency = 1 -- inicia invisível
+borderFrame.Parent = screenGui
+
+local borderCorner = Instance.new("UICorner")
+borderCorner.CornerRadius = UDim.new(0, 50)
+borderCorner.Parent = borderFrame
+
+-- Frame principal (cápsula interna)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.4, 0, 0.1, 0)
+frame.Position = UDim2.new(0.01, 0, 0.01, 0)
+frame.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 1 -- inicia invisível
+frame.Parent = borderFrame
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 50)
+corner.Parent = frame
+
+-- Texto
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.Position = UDim2.new(0, 0, 0, 0)
+textLabel.BackgroundTransparency = 1
+textLabel.Text = "Welcome to SophieHub-SFZ"
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextScaled = true
+textLabel.Font = Enum.Font.GothamBold
+textLabel.TextTransparency = 1 -- inicia invisível
+textLabel.Parent = frame
+
+-- Função fade-in
+local function fadeIn(duration)
+    local step = 0.05
+    local increment = step / duration
+    local transparency = 1
+    while transparency > 0 do
+        transparency = math.max(transparency - increment, 0)
+        frame.BackgroundTransparency = transparency
+        borderFrame.BackgroundTransparency = transparency
+        textLabel.TextTransparency = transparency
+        wait(step)
+    end
+end
+
+-- Função fade-out
+local function fadeOut(duration)
+    local step = 0.05
+    local increment = step / duration
+    local transparency = 0
+    while transparency < 1 do
+        transparency = math.min(transparency + increment, 1)
+        frame.BackgroundTransparency = transparency
+        borderFrame.BackgroundTransparency = transparency
+        textLabel.TextTransparency = transparency
+        wait(step)
+    end
+end
+
+-- Função pulse para a borda
+local function pulseBorder(duration, times)
+    for i = 1, times do
+        -- Aumenta a clareza
+        for t = 0, 1, 0.05 do
+            borderFrame.BackgroundColor3 = Color3.fromRGB(
+                138 + math.floor(20 * t),
+                43 + math.floor(20 * t),
+                226 + math.floor(20 * t)
+            )
+            wait(duration * 0.05)
+        end
+        -- Volta ao normal
+        for t = 0, 1, 0.05 do
+            borderFrame.BackgroundColor3 = Color3.fromRGB(
+                158 - math.floor(20 * t),
+                63 - math.floor(20 * t),
+                246 - math.floor(20 * t)
+            )
+            wait(duration * 0.05)
+        end
+    end
+end
+
+-- Executar animação
+spawn(function() fadeIn(0.5) end)   -- fade-in
+wait(0.5)                           -- espera o fade-in terminar
+
+-- Pulse borda enquanto visível
+spawn(function() pulseBorder(0.5, 5) end)
+
+wait(5)                             -- mantém visível
+fadeOut(0.5)                        -- fade-out
+screenGui:Destroy()
+
 wait(1) 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -52,22 +164,10 @@ content.BorderSizePixel = 0
 Instance.new("UICorner", content).CornerRadius = UDim.new(0, 15)
 
 local tabs = {
-	"🌲99 noites",
-	"👽 Steal a brainrot",
-	"🍎 Blox Fruits",
-	"🏐 Voleyball Legends",
-	"⚽ Blue Lock",
-	"🎭 Forsaken",
-	"🌴 Grow a Garden",
-	"🐟 Fish",
-	"👊 Campos de Batalha",
-	"🛶 Build a Boat",
-	"🔪 MM2",
-	"⛏️ The Forge",
-	"🗡️ Blade Ball",
-	"☠️ Death Ball",
-	"🏠 Brookheaven RP",
-	"🚂 Trilhos Mortos"
+	"🌲99 noites", "👽 Steal a brainrot", "🍎 Blox Fruits", "🏐 Voleyball Legends",
+	"⚽ Blue Lock", "🎭 Forsaken", "🌴 Grow a Garden", "🐟 Fish",
+	"👊 Campos de Batalha", "🛶 Build a Boat", "🔪 MM2", "⛏️ The Forge",
+	"🗡️ Blade Ball", "☠️ Death Ball", "🏠 Brookheaven RP", "🚂 Trilhos Mortos"
 }
 local pages = {}
 
@@ -120,16 +220,13 @@ for i, name in ipairs(tabs) do
 	pages[name] = page
 
 	local titleText = name
-	-- Adiciona o aviso de risco na categoria específica
-	if name == "🏐 Voleyball Legends" then
-		titleText = name .. " ⚠️ ALTO RISCO"
-	end
+	if name == "🏐 Voleyball Legends" then titleText = name .. " ⚠️ ALTO RISCO" end
 
 	local title = Instance.new("TextLabel", page)
 	title.Size = UDim2.new(1, 0, 0, 40)
 	title.Text = titleText
 	title.Font = Enum.Font.GothamBlack
-	title.TextSize = 20 -- Reduzido levemente para caber o aviso
+	title.TextSize = 20
 	title.TextColor3 = Color3.fromRGB(180, 140, 255)
 	if name == "🏐 Voleyball Legends" then title.TextColor3 = Color3.fromRGB(255, 50, 50) end
 	title.BackgroundTransparency = 1
@@ -141,16 +238,13 @@ for i, name in ipairs(tabs) do
 		addSub("H4x (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua",true))() end)
 		addSub("Foxname (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-Foxname-Hub-57131"))() end)
 		addSub("Ntt Hub (com key)", function() loadstring(game:HttpGet('https://ntt-hub.xyz/api/repo?id1=main&id2=lua'))() end)
-		addSub("Simplicitiy (sem key, porém bem básico)", function() loadstring(game:HttpGet("https://pastebin.com/raw/husyDTrd"))() end)
-		addSub("Diamantes (sem key)", function() 
-			getgenv().WebhookURL = "" 
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))() 
-		end)
+		addSub("Simplicitiy (sem key)", function() loadstring(game:HttpGet("https://pastebin.com/raw/husyDTrd"))() end)
+		addSub("Diamantes (sem key)", function() getgenv().WebhookURL = "" loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))() end)
 		addSub("Farm Days & Diamond (sem key)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FNDayFarm.lua'))() end)
 
 	elseif name == "👽 Steal a brainrot" then
 		addSub("Overflow (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OverflowBGSI/Overflow/refs/heads/main/loader.txt"))() end)
-		addSub("[2] SCRIPT BRAINROT – Lurk Hack (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurkv3/refs/heads/main/main.lua", true))() end)
+		addSub("Lurk Hack V3 (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurkv3/refs/heads/main/main.lua", true))() end)
 		addSub("Lurk Hack V4 (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/lurkhackv4/refs/heads/main/main.lua", true))() end)
 		addSub("Senju (com key)", function() loadstring(game:HttpGet("https://pastebin.com/raw/wk11PpEw"))() end)
 		addSub("Devil Ugly (sem key)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/53325754de16c11fbf8bf78101c1c881.lua"))() end)
@@ -173,18 +267,14 @@ for i, name in ipairs(tabs) do
 	elseif name == "🍎 Blox Fruits" then
 		addSub("GRAVITY HUB (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))() end)
 		addSub("SPEED HUB (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))() end)
-		addSub("XETER HUB (sem key)", function() 
-			getgenv().Version = "V3"
-			getgenv().Team = "Marines"
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() 
-		end)
+		addSub("XETER HUB (sem key)", function() getgenv().Version = "V3" getgenv().Team = "Marines" loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() end)
 		addSub("KNCRYPT (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/3345-c-a-t-s-u-s/Kncrypt/refs/heads/main/sources/BloxFruit.lua"))() end)
 		addSub("AURORA (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly261/BloxFruits/main/Aurora",true))() end)
 		addSub("ARCENEY (com key)", function() loadstring(game.HttpGet(game,'https://raw.githubusercontent.com/Yumiara/Python/refs/heads/main/BloxFruit-XYZ.lua'))() end)
 		addSub("OMG hub (??? Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))() end)
-		addSub("QUANTUM ONYX HUB (sem key) RECOMENDADO", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end)
-		addSub("ASTRAL (sem key) ⚠️ Descontínuado", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-ASTRAL-29222"))() end)
-		addSub("REDZ HUB (sem key — parou de funcionar)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/luraobermeyer-jpg/redzhub/refs/heads/main/redzhub.lua.txt"))() end)
+		addSub("QUANTUM ONYX HUB (sem key) ⭐", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end)
+		addSub("ASTRAL (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-ASTRAL-29222"))() end)
+		addSub("REDZ HUB (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/luraobermeyer-jpg/redzhub/refs/heads/main/redzhub.lua.txt"))() end)
 		addSub("DEEP HUB (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/script/refs/heads/main/Deep", true))() end)
 		addSub("BlueX-Hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))() end)
 		addSub("Hoho (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))() end)
@@ -193,12 +283,84 @@ for i, name in ipairs(tabs) do
 		addSub("Thunder Z (com key)", function() loadstring(game:HttpGet(('https://raw.githubusercontent.com/ThunderZ-05/HUB/main/TestKey')))() end)
 
 	elseif name == "🏐 Voleyball Legends" then
-		addSub("SCRIPT VOLLEYBALL LEGENDS (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/raydjs/napoleonHub/refs/heads/main/src.lua"))() end)
-		addSub("SCRIPT VOLLEYBALL LEGENDS (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SkibidiCen/MainMenu/main/Code"))() end)
-		addSub("SCRIPT VOLLEYBALL LEGENDS (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/notjohnnylol/boiazuresotuff/refs/heads/main/loader"))() end)
-		addSub("SCRIPT VOLLEYBALL LEGENDS (sem key — porém bugado)", function() loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/Xm2iufas09ijmF/sigma-hub/refs/heads/main/temp.lua'))() end)
-		addSub("SCRIPT VOLLEYBALL LEGENDS (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))() end)
-		addSub("SCRIPT VOLLEYBALL LEGENDS (Hitbox Expander — sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/UPD-Volleyball-Legends-Hitbox-expander-NO-KEY-63949"))() end)
+		addSub("Napoleon Hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/raydjs/napoleonHub/refs/heads/main/src.lua"))() end)
+		addSub("SkibidiCen (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SkibidiCen/MainMenu/main/Code"))() end)
+		addSub("Azure (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/notjohnnylol/boiazuresotuff/refs/heads/main/loader"))() end)
+		addSub("Sigma Hub (bugado)", function() loadstring(game.HttpGet(game, 'https://raw.githubusercontent.com/Xm2iufas09ijmF/sigma-hub/refs/heads/main/temp.lua'))() end)
+		addSub("OMG hub (??? Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))() end)
+		addSub("Hitbox Expander (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/UPD-Volleyball-Legends-Hitbox-expander-NO-KEY-63949"))() end)
+
+	elseif name == "⚽ Blue Lock" then
+		addSub("BL Rivals (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LHking123456/7L93r5NhJxqYu/refs/heads/main/BLRivals"))() end)
+		addSub("SkibidiCen Blue Lock (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SkibidiCen/MainMenu/main/Code"))() end)
+
+	elseif name == "🎭 Forsaken" then
+		addSub("SkibidiCen Forsaken (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SkibidiCen/MainMenu/main/Code"))() end)
+		addSub("Moondiety (com key)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/m00ndiety/Moondiety/refs/heads/main/Loader'))() end)
+		addSub("Sak Forsaken (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OhhMyGehlee/sak/refs/heads/main/for"))() end)
+		addSub("SNT HUB (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Snowt69/SNT-HUB/refs/heads/main/Forsaken"))() end)
+		addSub("Ghostbin Forsaken (com key)", function() loadstring(game:HttpGet("https://ghostbin.axel.org/paste/5sppg/raw"))() end)
+
+	elseif name == "🌴 Grow a Garden" then
+		addSub("Speed Hub X (com key) ⭐", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))() end)
+		addSub("Best Autofarm (com key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-Best-Autofarm-Script-GUI-73698"))() end)
+
+	elseif name == "🐟 Fish" then
+		addSub("Disch Script (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/hakariqScripts/disch2/refs/heads/main/disch%20script"))() end)
+		addSub("Space Hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"))() end)
+		addSub("Eclipse Fisch (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/yolobradda/eclipsefisch/refs/heads/main/eclipsefisch"))() end)
+		addSub("Cayden Scripts (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/cayden305/Scripts/refs/heads/main/FischObfuscated.lua"))() end)
+
+	elseif name == "👊 Campos de Batalha" then
+		addSub("Aim Lock/Block (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/CombatGUI/refs/heads/main/TSBCombatGUI"))() end)
+		addSub("Nova Hub (sem key) ⭐", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Silly-Nova/Nova-Hub/refs/heads/main/TheStrongestBattlegrounds.lua"))() end)
+
+	elseif name == "🛶 Build a Boat" then
+		addSub("Auto Build System (sem key) ⭐", function() loadstring(game:HttpGet(("https://raw.githubusercontent.com/max2007killer/auto-build-not-limit/main/buildaboatv2obs.txt"),true))() end)
+		addSub("BABFT Hub (com key)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/TheRealAsu/BABFT/refs/heads/main/Loader.lua'))() end)
+
+	elseif name == "🔪 MM2" then
+		addSub("Capybara Hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconScrr/Murder-Mystery-2/refs/heads/main/Capybara%20Hub"))() end)
+		addSub("YARHM (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/source/yarhm/1.20/yarhm.lua"))() end)
+		addSub("Vertex Peak (sem key)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/vertex-peak/vertex/refs/heads/main/loadstring'))() end)
+		addSub("XHub Wave (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/wave-code-top/xhub/refs/heads/main/xhub.lua", true))() end)
+
+	elseif name == "⛏️ The Forge" then
+		addSub("Haze Hub (sem key)", function() loadstring(game:HttpGet("https://haze.wtf/api/script"))() end)
+		addSub("Nousigi (com key)", function() loadstring(game:HttpGet("https://nousigi.com/loader.lua"))() end)
+		addSub("Polluted (sem key)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))() end)
+		addSub("Zenith (com key)", function() loadstring(game:HttpGet("https://zenithhub.cloud/panel/script"))() end)
+		addSub("Rift Hub (com key)", function() loadstring(game:HttpGet("https://rifton.top/loader.lua"))() end)
+		addSub("Lunor (com key)", function() loadstring(game:HttpGet("https://lunor.dev/loader"))() end)
+		addSub("Airflow (sem key)", function() loadstring(game:HttpGet("https://airflowscript.com/loader"))() end)
+		addSub("Chiyo (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"))() end)
+		addSub("NS Hub (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/OhhMyGehlee/sh/refs/heads/main/a"))() end)
+		addSub("Solix (com key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/meobeo8/a/a/a"))() end)
+		addSub("Shaizy (sem key)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/d29f750a5d2c74070b792230ccde0f69.lua"))() end)
+
+	elseif name == "🗡️ Blade Ball" then
+		addSub("NodeX Hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/NodeX-Enc/NodeX/refs/heads/main/Main.lua"))() end)
+
+	elseif name == "☠️ Death Ball" then
+		addSub("Native Hub (com key) ⭐", function() loadstring(game:HttpGet("https://getnative.cc/script/loader"))() end)
+		addSub("Haze Hub (sem key)", function() loadstring(game:HttpGet("https://haze.wtf/api/script"))() end)
+		addSub("Astra Hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HypersHacks/AstraHub/main/Loader.lua"))() end)
+
+	elseif name == "🏠 Brookheaven RP" then
+		addSub("C00LKIDD HUB (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-C00LKIDD-HUB-By-lkzin-69221"))() end)
+		addSub("Neon X Hub (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Neon-X-Hub-Brookhaven-UPDATE-69265"))() end)
+		addSub("Tubers hub (sem key e bem básico)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Tubers-hub-69151"))() end)
+		addSub("Velmorith (sem key/árabe)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Velmorith-68896"))() end)
+		addSub("4 scripts Bypass FE (sem key/básico)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-4-scripts-Bypass-FE-68746"))() end)
+		addSub("Coquette Hub (sem key)", function() loadstring(game:HttpGet("https://ghostbin.axel.org/paste/8z4hy/raw"))() end)
+		addSub("Drip Client (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Drip-Client-51784"))() end)
+		addSub("Demon Hub (key=29200220274)", function() loadstring(game:HttpGet("https://pastefy.app/vn8cfnLw/raw"))() end)
+		addSub("Cartola Hub (com key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Cartola-hub-brookhaven-57407"))() end)
+		addSub("Fly Car (sem key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Mikeexc-Car-Fly-68939"))() end)
+
+	elseif name == "🚂 Trilhos Mortos" then
+		addSub("Gumanba Hub (sem key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails", true))() end)
+		addSub("SSBS Scripts (sem key)", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/S-S-B-S/S-S-B-S-Scripts/main/Dead%20Rails.lua'))() end)
 	end
 
 	button.MouseButton1Click:Connect(function()
@@ -207,4 +369,4 @@ for i, name in ipairs(tabs) do
 	end)
 end
 
-warn("✅ HUB ATUALIZADO: AVISO DE RISCO ADICIONADO AO VOLLEYBALL!")
+warn("✅ HUB FINALIZADO: TODOS OS SCRIPTS CARREGADOS!")
